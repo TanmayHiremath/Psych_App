@@ -10,9 +10,32 @@ const server = express()
 const io = socketIO(server);
 
 io.on('connection', (socket) => {
-  io.emit('connected','Date:'+ new Date().toTimeString())
-  console.log('Client connected');
-  socket.on('disconnect', () => console.log('Client disconnected'));
+  console.log("user connected");
+
+  socket.on("disconnect", function () {
+    console.log("user disconnected");
+  });
+
+  //Someone is typing
+  socket.on("typing", data => {
+    socket.broadcast.emit("notifyTyping", {
+      user: data.user,
+      message: data.message
+    });
+  });
+
+  //when soemone stops typing
+  socket.on("stopTyping", () => {
+    socket.broadcast.emit("notifyStopTyping");
+  });
+
+  socket.on("chat message", function (msg) {
+    console.log("message: " + msg);
+
+    //broadcast message to everyone in port:5000 except yourself.
+    socket.broadcast.emit("received", { message: msg });
+  });
 });
 
 setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
+
