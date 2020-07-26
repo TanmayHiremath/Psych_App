@@ -29,11 +29,11 @@ io.on('connection', (socket) => {
     socket.broadcast.emit("notifyStopTyping");
   });
 
-  socket.on("chat message", function (msg) {
-    console.log("message: " + msg);
+  socket.on("chat message", function (data) {
+    console.log("message: " + data['message']);
 
     //broadcast message to everyone in port:5000 except yourself.
-    socket.broadcast.emit("received", { message: msg });
+    socket.broadcast.emit("received", { username: data['username'], message: data['message'] });
   });
 });
 
