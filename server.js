@@ -9,33 +9,72 @@ const server = express()
 
 const io = socketIO(server);
 
-io.on('connection', (socket) => {
+const redisAdapter = require('socket.io-redis');
+io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
+
+io.on("connection", (socket) => {
+
   console.log("user connected");
 
-  socket.on("disconnect", function () {
-    console.log("user disconnected");
-  });
 
-  //Someone is typing
-  socket.on("typing", data => {
-    socket.broadcast.emit("notifyTyping", {
-      user: data.user,
-      message: data.message
+  socket.on("new room", (data) => { //send username and roomName in data
+    io.in(data['roomName']).clients((err, clients) => {
+      console.log(clients); // an array containing socket ids in roomName
+      if (clients.length == 0) {
+        socket.join(data['roomName']);
+      }
+      else {
+        socket.emit("room exists", { roomName: data['roomName'] })
+      }
     });
   });
 
-  //when soemone stops typing
-  socket.on("stopTyping", () => {
-    socket.broadcast.emit("notifyStopTyping");
+  socket.on("join room", (data) => {
+    io.in(data['roomName']).clients((err, clients) => {
+      if (clients.length > 0) {
+        socket.join(data['roomName']);
+        joined_room(data)
+      }
+      else {
+        socket.emit("no room exists", { roomName: data['roomName'] })
+      }
+    });
+  });
+  function joined_room(data) {
+    socket.to(data['roomName']).emit("joined room", { username: data['username'], roomName: data['roomName'] });
+  }
+
+
+
+
+  socket.on("typing", (data) => {
+    socket.to(data['roomName']).emit("notifyTyping", { user: data.user, roomName: data['roomName'] });
+  });
+
+
+  socket.on("stopTyping", (data) => {
+    socket.to(data['roomName']).emit("notifyStopTyping");
   });
 
   socket.on("chat message", function (data) {
-    console.log("message: " + data['message']);
-
-    //broadcast message to everyone in port:5000 except yourself.
-    socket.broadcast.emit("received", { username: data['username'], message: data['message'] });
+    io.of('/').adapter.allRooms((err, rooms) => {
+      console.log(err)
+      console.log('imp: ')
+      console.log(rooms); // an array containing all rooms (accross every node)
+    });
+    io.in(data['roomName']).clients((err, clients) => {
+      console.log(clients);
+    });
+    console.log(data['username'] + " : " + data['message'] + " in room: " + data['roomName']);
+    socket.to(data['roomName']).emit("received", { username: data['username'], message: data['message'], roomName: data['roomName'] });
   });
-});
 
-setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
 
+  setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
+
+
+
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+})
