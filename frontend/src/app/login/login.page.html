@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size-md=6 offset-md=3>
+        <ion-item>
+          <ion-label position="floating">Username</ion-label>
+          <ion-input required [(ngModel)]="username"></ion-input>
+
+        </ion-item>
+        <ion-button [disabled]="username==''" routerLink="../chat" (click)="set_username()" shape="round">Submit</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>
