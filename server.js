@@ -1,3 +1,4 @@
+import { randomWord } from './words'
 const express = require('express');
 const socketIO = require('socket.io');
 
@@ -17,16 +18,22 @@ io.on("connection", (socket) => {
 
 
   socket.on("new room", (data) => { //send username and roomName in data
-    io.in(data['roomName']).clients((err, clients) => {
-      console.log(clients); // an array containing socket ids in roomName
+    new_room()
+  });
+
+  function new_room(){
+    let random_word = randomWord()
+    io.in(random_word).clients((err, clients) => {
+      console.log('clients.length:'+clients.length); // an array containing socket ids in roomName
       if (clients.length == 0) {
-        socket.join(data['roomName']);
+        socket.join(random_word);
+        socket.emit('room created', { roomName: random_word })
       }
       else {
-        socket.emit("room exists", { roomName: data['roomName'] })
+        new_room()
       }
     });
-  });
+  }
 
   socket.on("join room", (data) => {
     io.in(data['roomName']).clients((err, clients) => {
