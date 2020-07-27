@@ -9,8 +9,7 @@ const server = express()
 
 const io = socketIO(server);
 
-const redisAdapter = require('socket.io-redis');
-io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
+
 
 io.on("connection", (socket) => {
 
@@ -57,11 +56,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("chat message", function (data) {
-    io.of('/').adapter.allRooms((err, rooms) => {
-      console.log(err)
-      console.log('imp: ')
-      console.log(rooms); // an array containing all rooms (accross every node)
-    });
+
     io.in(data['roomName']).clients((err, clients) => {
       console.log(clients);
     });
