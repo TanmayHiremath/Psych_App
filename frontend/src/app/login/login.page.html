@@ -11,9 +11,13 @@
         <ion-item>
           <ion-label position="floating">Username</ion-label>
           <ion-input required [(ngModel)]="username"></ion-input>
-
+          <ion-label position="floating">Room Name</ion-label>
+          <ion-input required [(ngModel)]="roomName"></ion-input>
         </ion-item>
-        <ion-button [disabled]="username==''" routerLink="../chat" (click)="set_username()" shape="round">Submit</ion-button>
+        <ion-button [disabled]="username=='' && roomName==''" routerLink="../chat" (click)="join_room()" shape="round">
+          Join Room</ion-button>
+          <ion-button [disabled]="username=='' && roomName==''" routerLink="../chat" (click)="new_room()" shape="round">
+            New Room</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>

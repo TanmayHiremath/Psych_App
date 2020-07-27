@@ -1,11 +1,12 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>chat</ion-title>
+    <ion-title>{{roomName}}</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen=true>
   <div *ngFor="let message of messages ">
-    <ion-row *ngIf="message.username==username" class="ion-justify-content-end ion-margin-start">
+    <ion-row *ngIf="message.username==username&&message.type=='message'"
+      class="ion-justify-content-end ion-margin-start">
       <ion-col size="auto">
         <ion-item lines="none" style="--border-radius:10px;--background:#075E54" end>
           <ion-label class="ion-text-wrap">
@@ -14,21 +15,28 @@
         </ion-item>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="message.username!=username" class="ion-justify-content-start ion-margin-end">
+    <ion-row *ngIf="message.username!=username&&message.type=='message'"
+      class="ion-justify-content-start ion-margin-end">
       <ion-col size="auto">
-          <ion-list lines="none" inset=true style="border-radius: 10px!important;" class="ion-no-padding ion-margin-start" end>
-            <ion-list-header style="--color:red;" lines="none" class="ion-no-padding ion-no-margin ion-padding-horizontal">
-              <ion-label> <b>{{message.username}}</b> </ion-label>
-            </ion-list-header>
-            <ion-item>
-              <ion-label class="ion-text-wrap ion-no-margin ion-no-padding">
-                {{message.message}}
-              </ion-label>
-            </ion-item>
-          </ion-list>      
+        <ion-list lines="none" inset=true style="border-radius: 10px!important;" class="ion-no-padding ion-margin-start"
+          end>
+          <ion-list-header style="--color:red;" lines="none"
+            class="ion-no-padding ion-no-margin ion-padding-horizontal">
+            <ion-label> <b>{{message.username}}</b> </ion-label>
+          </ion-list-header>
+          <ion-item>
+            <ion-label class="ion-text-wrap ion-no-margin ion-no-padding">
+              {{message.message}}
+            </ion-label>
+          </ion-item>
+        </ion-list>
       </ion-col>
     </ion-row>
-
+    <ion-row *ngIf="message.type=='join'">
+      <ion-col size-md=4 offset-md=4>
+        <b> {{message.username}}</b> joined
+      </ion-col>
+    </ion-row>
   </div>
 </ion-content>
 <ion-footer class="ion-no-bordr">
