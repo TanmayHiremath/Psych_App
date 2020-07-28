@@ -13,7 +13,7 @@ const io = socketIO(server);
 
 
 io.on("connection", (socket) => {
-  var rooms_leaving;
+  var rooms_leaving=[];
   console.log("user connected");
 
 
@@ -80,7 +80,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    rooms_leaving.map(x => {
+    rooms_leaving.forEach(x => {
       socket.to(x).emit("disconnected", { username: data['username'], roomName: data['roomName'] });
     })
     console.log("user disconnected");
