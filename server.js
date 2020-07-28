@@ -11,8 +11,9 @@ const io = socketIO(server);
 
 
 
-io.on("connection", (socket) => {
 
+io.on("connection", (socket) => {
+  var rooms_leaving;
   console.log("user connected");
 
 
@@ -73,9 +74,15 @@ io.on("connection", (socket) => {
 
   setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
 
-
+  socket.on('disconnecting', () => {
+    rooms_leaving = socket.rooms
+    // the rooms array contains at least the socket ID
+  });
 
   socket.on("disconnect", () => {
+    rooms_leaving.map(x => {
+      socket.to(x).emit("disconnected", { username: data['username'], roomName: data['roomName'] });
+    })
     console.log("user disconnected");
   });
 
