@@ -15,6 +15,7 @@
         </ion-item>
       </ion-col>
     </ion-row>
+
     <ion-row *ngIf="message.username!=username&&message.type=='message'"
       class="ion-justify-content-start ion-margin-end">
       <ion-col size="auto">
@@ -32,9 +33,10 @@
         </ion-list>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="message.type=='join'">
-      <ion-col size-md=4 offset-md=4>
-        <b> {{message.username}}</b> joined
+
+    <ion-row *ngIf="message.type=='joined'||message.type=='disconnected'">
+      <ion-col size=4 offset=4>
+        <b style="color: greenyellow;"> {{message.username}}</b> {{message.type}}
       </ion-col>
     </ion-row>
   </div>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { Observable } from 'rxjs';
 import { DataService } from '../data.service'
+import { Storage } from '@ionic/storage';
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.page.html',
@@ -13,9 +14,9 @@ export class ChatPage implements OnInit {
   current_message: string = ''
   messages = []
   others_messages = []
-  constructor(private socket: Socket, private service: DataService) {
-    this.username = this.service.getJdata('username')
-    this.roomName = this.service.getJdata('roomName')
+  constructor(private socket: Socket, private service: DataService,private storage:Storage) {
+    storage.get('username').then((val)=>{this.username=val})
+    storage.get('roomName').then((val)=>{this.roomName=val})
     let recieved = new Observable(observer => {
       this.socket.on('received', (data: object) => {
         console.log('recieved message')
@@ -28,7 +29,10 @@ export class ChatPage implements OnInit {
     });
 
     this.socket.on('joined room', (data: object) => {
-      this.messages.push({ username: data['username'], roomName: data['roomName'], type: 'join' })
+      this.messages.push({ username: data['username'], roomName: data['roomName'], type: 'joined' })
+    });
+    this.socket.on('disconnected', (data: object) => {
+      this.messages.push({ username: data['username'], roomName: data['roomName'], type: 'disconnected' })
     });
   }
 
