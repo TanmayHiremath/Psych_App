@@ -75,7 +75,8 @@ io.on("connection", (socket) => {
   setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
 
   socket.on('disconnecting', () => {
-    rooms_leaving = socket.rooms
+
+    rooms_leaving = Object.keys(socket.rooms)
     console.log('rooms_leaving: '+rooms_leaving)
     // the rooms array contains at least the socket ID
   });
