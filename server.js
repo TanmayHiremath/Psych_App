@@ -13,7 +13,7 @@ const io = socketIO(server);
 
 
 io.on("connection", (socket) => {
-  var rooms_leaving=[];
+  var rooms_leaving;
   console.log("user connected");
 
 
