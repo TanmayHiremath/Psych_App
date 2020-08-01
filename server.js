@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
       socket.to(x).emit("disconnected", { username: people[socket.id] });
     }
     console.log("user disconnected:" + people[socket.id]);
-    delete people[client.id];
+    delete people[socket.id];
   });
 
   function randomWord() {
