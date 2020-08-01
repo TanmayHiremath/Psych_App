@@ -76,13 +76,14 @@ io.on("connection", (socket) => {
 
   socket.on('disconnecting', () => {
     rooms_leaving = socket.rooms
+    console.log('rooms_leaving: '+rooms_leaving)
     // the rooms array contains at least the socket ID
   });
 
   socket.on("disconnect", () => {
-    rooms_leaving.forEach(x => {
+    for(const x of rooms_leaving) {
       socket.to(x).emit("disconnected", { username: data['username'], roomName: data['roomName'] });
-    })
+    }
     console.log("user disconnected");
   });
 
