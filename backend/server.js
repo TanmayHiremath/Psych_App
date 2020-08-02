@@ -9,63 +9,59 @@ const server = express()
 
 const io = socketIO(server);
 
-
-
+var people = {};
 
 io.on("connection", (socket) => {
-  var rooms_leaving=[];
+  var rooms_leaving;
   console.log("user connected");
 
-
   socket.on("new room", (data) => { //send username and roomName in data
-    new_room()
+    new_room(data)
   });
-
-  function new_room() {
+  function new_room(data) {
     let random_word = randomWord()
     io.in(random_word).clients((err, clients) => {
       console.log('clients.length:' + clients.length); // an array containing socket ids in roomName
       if (clients.length == 0) {
         socket.join(random_word);
-        socket.emit('room created', { roomName: random_word })
+        people[socket.id] = data['username'];
+        socket.emit("room created", { roomName: random_word })
+        console.log("room created:" + random_word + ' by :' + data['username'])
       }
       else {
+        console.log("searching new room name")
         new_room()
       }
     });
   }
 
-  socket.on("join room", (data) => {
+  socket.on("join room", (data) => {  //send username and roomName in data
     io.in(data['roomName']).clients((err, clients) => {
       if (clients.length > 0) {
         socket.join(data['roomName']);
-        joined_room(data)
+        people[socket.id] = data['username'];
+        console.log(people[socket.id] + ' joined room ' + data['roomName'])
+        socket.to(data['roomName']).emit("joined room", { username: data['username'], roomName: data['roomName'] });
       }
       else {
         socket.emit("no room exists", { roomName: data['roomName'] })
+        console.log("No room exists: " + data['roomName'])
       }
     });
   });
-  function joined_room(data) {
-    socket.to(data['roomName']).emit("joined room", { username: data['username'], roomName: data['roomName'] });
-  }
+
+  // socket.on("typing", (data) => {
+  //   socket.to(data['roomName']).emit("notifyTyping", { user: data.user, roomName: data['roomName'] });
+  // });
 
 
-
-
-  socket.on("typing", (data) => {
-    socket.to(data['roomName']).emit("notifyTyping", { user: data.user, roomName: data['roomName'] });
-  });
-
-
-  socket.on("stopTyping", (data) => {
-    socket.to(data['roomName']).emit("notifyStopTyping");
-  });
+  // socket.on("stopTyping", (data) => {
+  //   socket.to(data['roomName']).emit("notifyStopTyping");
+  // });
 
   socket.on("chat message", function (data) {
-
     io.in(data['roomName']).clients((err, clients) => {
-      console.log(clients);
+      console.log("clients present in room:" + clients);
     });
     console.log(data['username'] + " : " + data['message'] + " in room: " + data['roomName']);
     socket.to(data['roomName']).emit("received", { username: data['username'], message: data['message'], roomName: data['roomName'] });
@@ -75,15 +71,17 @@ io.on("connection", (socket) => {
   setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
 
   socket.on('disconnecting', () => {
-    rooms_leaving = socket.rooms
+    rooms_leaving = Object.keys(socket.rooms)
+    console.log('rooms_leaving: ' + rooms_leaving)
     // the rooms array contains at least the socket ID
   });
 
   socket.on("disconnect", () => {
-    rooms_leaving.forEach(x => {
-      socket.to(x).emit("disconnected", { username: data['username'], roomName: data['roomName'] });
-    })
-    console.log("user disconnected");
+    for (const x of rooms_leaving) {
+      socket.to(x).emit("disconnected", { username: people[socket.id] });
+    }
+    console.log("user disconnected:" + people[socket.id]);
+    delete people[socket.id];
   });
 
   function randomWord() {
