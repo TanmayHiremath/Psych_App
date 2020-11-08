@@ -9,5 +9,9 @@
   * [Angular 8 tutorial](https://www.youtube.com/playlist?list=PLC3y8-rFHvwhBRAgFinJR8KHIrCdTkZcZ)
   * [Ionic Basic Tutorial](https://www.youtube.com/watch?v=r2ga-iXS5i4) *Not much useful tbh*
   * For Socketio in Nodejs,[Socketio](https://socket.io/docs/server-initialization/#With-Express) docs are the best tutorial.
+  
+  
+  Maintainer: Tanmay Hiremath
+  Developer: Jay Sonawane
 
 
