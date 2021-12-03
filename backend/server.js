@@ -10,6 +10,8 @@ const server = express()
 const io = socketIO(server);
 
 var people = {};
+setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
+
 
 io.on("connection", (socket) => {
   var rooms_leaving;
